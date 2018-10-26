@@ -3,13 +3,22 @@ import {View, Text} from 'react-native'
 import UneAction from './UneAction'
 
 
-const ListeActions = () => {
+const ListeActions = ({actions, supprimerAction, changerTermine, currentFilter}) => {
+
+    let filteredActions;
+
+    if(currentFilter === "Actives"){
+        filteredActions = actions.filter(action => !action.termine)
+    }else if (currentFilter === "Terminées"){
+        filteredActions = actions.filter(action => action.termine)
+    }else{
+        filteredActions = actions
+    } 
 
     return (
         <View>
-            <Text>Ici prochainement une liste d'actions</Text>
+            {filteredActions.map((act,i)=> <UneAction key={i} action={act} supprimerAction={supprimerAction} changerTermine={changerTermine} />)}
         </View>
     )
 }
-
 export default ListeActions

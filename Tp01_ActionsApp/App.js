@@ -14,7 +14,9 @@ export default class App extends React.Component {
     // état global de l'application
     // il y aura probalement d'autres informations à stocker
     state = {
-        texteSaisie: ''
+        texteSaisie: '',
+        actions: [],
+        currentFilter: 'Toutes'
     }
 
     /**
@@ -24,27 +26,54 @@ export default class App extends React.Component {
      */
     quandLaSaisieChange(nouvelleSaisie) {
         console.log('la saisie à changée', nouvelleSaisie)
+        this.setState({texteSaisie: nouvelleSaisie})
     }
+
+    supprimerAction(index) {
+        console.log("remove");
+        var array = [...this.state.actions];
+        
+        array.splice(index, 1);
+        this.setState({actions: array});
+    }
+
+    changerTermine(index) {
+        console.log("change");
+        var array = [...this.state.actions];
+        array.filter(action => action.index === index).forEach(action => action.termine = !action.termine);
+        this.setState({actions: array});
+}
+
 
     /**
      * Méthode invoquée lors du clic sur le bouton `Valider`.
      */
     validerNouvelleAction() {
         console.log('Vous avez cliqué sur Valider !')
+        const actionsTmp = [...this.state.actions,{titre: this.state.texteSaisie, termine: false, index: this.state.actions.length}]
+        this.setState({texteSaisie: '', actions: actionsTmp})
+    }
+
+    changeFilter(newFilter) {
+        this.setState({currentFilter: newFilter});
     }
 
     render() {
-        const {texteSaisie} = this.state
+        const {texteSaisie,actions, currentFilter} = this.state
 
         return (
             <View style={styles.conteneur}>
                 <ScrollView keyboardShouldPersistTaps='always' style={styles.content}>
                     <Entete/>
                     <Saisie texteSaisie={texteSaisie} evtTexteModifie={(titre) => this.quandLaSaisieChange(titre)}/>
-                    <ListeActions />
+                    <ListeActions actions={actions}
+                    supprimerAction={ind => this.supprimerAction(ind)}
+                    changerTermine={ind => this.changerTermine(ind)}
+                    currentFilter={currentFilter}
+                    />
                     <BoutonCreer onValider={() => this.validerNouvelleAction()}/>
                 </ScrollView>
-                <Menu/>
+                <Menu changeFilter={ind => this.changeFilter(ind)} />
             </View>
         )
     }
